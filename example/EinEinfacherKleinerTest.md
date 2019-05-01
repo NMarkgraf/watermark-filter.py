@@ -4,10 +4,7 @@ author: "Norman Markgraf"
 date: "1.5.2019"
 output: 
     beamer_presentation:
-        keep_tex: true
-        includes:
-            in_header: 
-                - header.tex
+        keep_tex: false
         pandoc_args:
             - --filter
             - ../watermark.py

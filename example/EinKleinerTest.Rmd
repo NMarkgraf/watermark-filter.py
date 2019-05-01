@@ -5,9 +5,6 @@ date: "1.5.2019"
 output: 
     beamer_presentation:
         keep_tex: true
-        includes:
-            in_header: 
-                - header.tex
         pandoc_args:
             - --filter
             - ../watermark.py
@@ -19,12 +16,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Ein kleiner Test für Wasserzeichen
 
-## Eine einfache Folie {watermark=DEPRICATED}
+## Eine einfache Folie {include-only=deprecated}
 
 
 Lore ipsum
 
-## Ein andere Folie
+## Ein andere Folie {include-only=bachelor}
 
 Lore ipsum
 

@@ -61,7 +61,7 @@ elif os.path.exists("watermark.loglevel.warning"):
 elif os.path.exists("watermark.loglevel.error"):
     DEBUGLEVEL = logging.ERROR
 else:
-    DEBUGLEVEL = logging.ERROR  # .ERROR or .DEBUG  or .INFO
+    DEBUGLEVEL = logging.ERROR # .ERROR or .DEBUG  or .INFO
 
 logging.basicConfig(filename='watermark.log', level=DEBUGLEVEL)
 
@@ -84,14 +84,37 @@ def action(elem, doc):
                 return [elem, getDeprecatedMark("MASTER ONLY!", doc.format)]
             if "bachelor" in lst:
                 return [elem, getDeprecatedMark("BACHELOR ONLY!", doc.format)]
+        if "exclude" in elem.attributes:
+            lst = list(map(lambda x: x.strip(), elem.attributes["exclude"].split(",")))
 
 
-def prepare(doc):
+def _prepare(doc):
     pass
 
 
-def finalize(doc):
-    pass
+def _finalize(doc):
+    logging.debug("Finalize doc!")
+    # Add header-includes if necessary
+    if "header-includes" not in doc.metadata:
+        if doc.get_metadata("output.beamer_presentation.includes") is None:
+            logging.debug("No 'header-includes' nor `includes` ? Created 'header-includes'!")
+            doc.metadata["header-includes"] = pf.MetaList()
+            hdr_inc = "header-includes"
+        else:
+            logging.ERROR("Found 'includes'! SAD THINK")
+            exit(1)
+
+    # Convert header-includes to MetaList if necessary
+
+    logging.debug("Append background packages to `header-includes`")
+
+    if not isinstance(doc.metadata[hdr_inc], pf.MetaList):
+        logging.debug("The '"+hdr_inc+"' is not a list? Converted!")
+        doc.metadata[hdr_inc] = pf.MetaList(doc.metadata[hdr_inc])
+
+    doc.metadata[hdr_inc].append(
+        pf.MetaInlines(pf.RawInline("\\usepackage[pages=some,placement=center,scale=3,angle=45,color=red!55]{background}", "latex"))
+    )
 
 
 def main(doc=None):
@@ -99,22 +122,16 @@ def main(doc=None):
     """
     
     logging.debug("Start pandoc filter 'watermark.py'")
-    mydoc = doc
-    flag = False
-
-    if isinstance(mydoc, pf.Doc):
-        mydoc = doc.content
-        flag = True
 
     ret = pf.run_filter(action,
-                         prepare=prepare,
-                         finalize=finalize,
-                         doc=mydoc)
+                         prepare=_prepare,
+                         finalize=_finalize,
+                         doc=doc)
+                         
     logging.debug("End pandoc filter 'watermark.py'")
-    if flag:
-        doc.content = ret
-    else:
-        doc = ret
-    return doc
+
+    return ret
+  
+
 if __name__ == "__main__":
     main()
