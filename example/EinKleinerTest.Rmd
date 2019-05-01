@@ -1,0 +1,34 @@
+---
+title: "Ein kleiner Test für Wasserzeichen"
+author: "Norman Markgraf"
+date: "1.5.2019"
+output: 
+    beamer_presentation:
+        keep_tex: true
+        includes:
+            in_header: 
+                - header.tex
+        pandoc_args:
+            - --filter
+            - ../watermark.py
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Ein kleiner Test für Wasserzeichen
+
+## Eine einfache Folie {watermark=DEPRICATED}
+
+
+Lore ipsum
+
+## Ein andere Folie
+
+Lore ipsum
+
+
+## Noch eine Folie
+
+Lore ipsum
