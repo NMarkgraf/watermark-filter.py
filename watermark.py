@@ -2,13 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-  Quick-Watermark-Filter: matermark.py
+  matermark.py (Release: 0.1.1)
+  ========---------------------
+
+  A Quick-Watermark-Pandoc-Panflute-Filter. 
 
   (C)opyleft in 2019 by Norman Markgraf (nmarkgraf@hotmail.com)
 
   Release:
   ========
-  1.0.0 - 01.05.2019 (nm) - Erster Aufschlag
+  0.1.0 - 01.05.2019 (nm) - Erster Aufschlag
+  0.1.1 - 02.05.2019 (nm) - Kleinere Korrekturen und Anpassungen
  
 
   WICHTIG:
@@ -84,22 +88,31 @@ def action(elem, doc):
                 return [elem, getDeprecatedMark("MASTER ONLY!", doc.format)]
             if "bachelor" in lst:
                 return [elem, getDeprecatedMark("BACHELOR ONLY!", doc.format)]
+                
         if "exclude" in elem.attributes:
             lst = list(map(lambda x: x.strip(), elem.attributes["exclude"].split(",")))
+            if "master" in lst:
+                return [elem, getDeprecatedMark("NO MASTER!", doc.format)]
+            if "bachelor" in lst:
+                return [elem, getDeprecatedMark("NO BACHELOR!", doc.format)]
+                
+        if "watermark" in elem.attributes:
+            return [elem, getDeprecatedMark(elem.attributes["watermark"], doc.format)]
 
 
 def _prepare(doc):
-    pass
+    if "watermark" not in doc.metadata:
+        pass
 
 
 def _finalize(doc):
     logging.debug("Finalize doc!")
+    hdr_inc = "header-includes"
     # Add header-includes if necessary
     if "header-includes" not in doc.metadata:
         if doc.get_metadata("output.beamer_presentation.includes") is None:
             logging.debug("No 'header-includes' nor `includes` ? Created 'header-includes'!")
-            doc.metadata["header-includes"] = pf.MetaList()
-            hdr_inc = "header-includes"
+            doc.metadata[hdr_inc] = pf.MetaList()
         else:
             logging.ERROR("Found 'includes'! SAD THINK")
             exit(1)
